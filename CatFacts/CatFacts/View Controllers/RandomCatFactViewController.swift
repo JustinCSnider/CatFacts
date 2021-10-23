@@ -13,6 +13,7 @@ class RandomCatFactViewController: UIViewController {
     // MARK: - IBOutlets
     
     @IBOutlet weak var titleLabel: UILabel!
+    @IBOutlet weak var randomCatImageView: UIImageView!
     @IBOutlet weak var randomFactLabel: UILabel!
     
     // MARK: - Overrides
@@ -48,6 +49,17 @@ class RandomCatFactViewController: UIViewController {
                 self.showAlert(title: "Error Loading Fact", message: "Please try again")
             }
         }
+        
+        getRandomCatImage { imageCompletion in
+            do {
+                let catImage = try imageCompletion()
+                DispatchQueue.main.async {
+                    self.randomCatImageView.image = catImage
+                }
+            } catch {
+                self.showAlert(title: "Error Loading Image", message: "Please try again")
+            }
+        }
     }
     
     // MARK: - Functions
@@ -77,6 +89,25 @@ class RandomCatFactViewController: UIViewController {
             } catch {
                 completion { throw error }
             }
+        }
+    }
+    
+    private func getRandomCatImage(_ completion: @escaping (_ imageCompletion: () throws -> UIImage?) -> Void) {
+        guard let url = URL(string: "https://cataas.com/#/") else {
+            completion { throw NetworkError.invalidURL }
+            return
+        }
+        
+        NetworkController.performNetworkRequest(for: url, httpMethod: "GET") { data, error in
+            guard let data = data, error == nil else {
+                completion { throw error ?? NetworkError.dataUnavailable }
+                return
+            }
+            
+            completion {
+                return UIImage(data: data)
+            }
+            
         }
     }
 

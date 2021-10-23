@@ -62,23 +62,31 @@
                                     <constraint firstItem="f5C-td-ArS" firstAttribute="leading" secondItem="nqA-uV-ghV" secondAttribute="leading" id="pbN-0Z-KKY"/>
                                 </constraints>
                             </view>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="9UQ-2f-Lgh">
+                                <rect key="frame" x="20" y="124" width="374" height="306.5"/>
+                            </imageView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="b9W-wm-nIT"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="Coc-89-2wm" firstAttribute="centerY" secondItem="95l-Ip-rdd" secondAttribute="centerY" constant="80" id="4VT-ec-bNY"/>
+                            <constraint firstItem="b9W-wm-nIT" firstAttribute="trailing" secondItem="9UQ-2f-Lgh" secondAttribute="trailing" constant="20" id="5QM-b2-KY6"/>
                             <constraint firstAttribute="trailing" secondItem="Coc-89-2wm" secondAttribute="trailing" constant="24" id="OFW-Zj-eCI"/>
+                            <constraint firstItem="DcR-Q7-NUh" firstAttribute="top" secondItem="9UQ-2f-Lgh" secondAttribute="bottom" constant="20" id="QF7-oh-9WQ"/>
                             <constraint firstItem="nqA-uV-ghV" firstAttribute="top" secondItem="b9W-wm-nIT" secondAttribute="top" id="ULI-4j-UFu"/>
                             <constraint firstItem="DcR-Q7-NUh" firstAttribute="leading" secondItem="b9W-wm-nIT" secondAttribute="leading" constant="12" id="cuV-Zc-XBd"/>
                             <constraint firstItem="Coc-89-2wm" firstAttribute="leading" secondItem="95l-Ip-rdd" secondAttribute="leading" constant="24" id="djJ-6Z-nxP"/>
+                            <constraint firstItem="9UQ-2f-Lgh" firstAttribute="top" secondItem="nqA-uV-ghV" secondAttribute="bottom" constant="20" id="jXG-KG-Oc5"/>
                             <constraint firstItem="b9W-wm-nIT" firstAttribute="trailing" secondItem="DcR-Q7-NUh" secondAttribute="trailing" constant="12" id="oQU-lk-ltW"/>
                             <constraint firstItem="b9W-wm-nIT" firstAttribute="trailing" secondItem="nqA-uV-ghV" secondAttribute="trailing" id="oT9-Tz-2Lb"/>
                             <constraint firstItem="Coc-89-2wm" firstAttribute="top" secondItem="DcR-Q7-NUh" secondAttribute="bottom" constant="36" id="rDn-dT-USl"/>
                             <constraint firstItem="nqA-uV-ghV" firstAttribute="leading" secondItem="b9W-wm-nIT" secondAttribute="leading" id="t7z-Px-tgP"/>
+                            <constraint firstItem="9UQ-2f-Lgh" firstAttribute="leading" secondItem="b9W-wm-nIT" secondAttribute="leading" constant="20" id="uJb-ME-1h9"/>
                         </constraints>
                     </view>
                     <tabBarItem key="tabBarItem" title="Random Cat Fact" id="gpd-Zg-ce6"/>
                     <connections>
+                        <outlet property="randomCatImageView" destination="9UQ-2f-Lgh" id="dmP-ZY-W7b"/>
                         <outlet property="randomFactLabel" destination="DcR-Q7-NUh" id="fic-hi-dDY"/>
                         <outlet property="titleLabel" destination="kzZ-20-M61" id="Ivq-6J-Img"/>
                     </connections>

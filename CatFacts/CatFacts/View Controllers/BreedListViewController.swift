@@ -43,11 +43,12 @@ class BreedListViewController: UIViewController {
         setupViews()
         setupNetworkMonitor()
         
-        getBreeds(fromPage: currentPage, { currentPage, nextPage, breedsCompletion in
+        getBreeds(fromPage: currentPage, { breedsCompletion in
             do {
-                self.breedsList.append(contentsOf: try breedsCompletion())
-                self.currentPage = currentPage ?? self.currentPage
-                self.nextPage = nextPage
+                let breedsTuple = try breedsCompletion()
+                self.breedsList.append(contentsOf: breedsTuple.breedsList)
+                self.currentPage = breedsTuple.currentPage ?? self.currentPage
+                self.nextPage = breedsTuple.nextPage
             } catch {
                 self.showAlert(title: "Error Loading Breeds", message: "Please try again")
             }
@@ -58,15 +59,16 @@ class BreedListViewController: UIViewController {
     
     @objc private func refreshBreeds() {
         titleLabel.text = "Loading Breeds..."
-        getBreeds(fromPage: currentPage, { currentPage, nextPage, breedsCompletion  in
+        getBreeds(fromPage: currentPage, { breedsCompletion in
             DispatchQueue.main.async {
                 self.refreshControl.endRefreshing()
                 self.titleLabel.text = "Cat Breed List"
             }
             do {
-                self.breedsList.append(contentsOf: try breedsCompletion())
-                self.currentPage = currentPage ?? self.currentPage
-                self.nextPage = nextPage
+                let breedsTuple = try breedsCompletion()
+                self.breedsList.append(contentsOf: breedsTuple.breedsList)
+                self.currentPage = breedsTuple.currentPage ?? self.currentPage
+                self.nextPage = breedsTuple.nextPage
             } catch {
                 print("\(error.localizedDescription)")
                 self.showAlert(title: "Error Loading Breeds", message: "Please try again")
@@ -74,36 +76,36 @@ class BreedListViewController: UIViewController {
         })
     }
     
-    private func getBreeds(fromPage page: Int, _ completion: @escaping (_ currentPage: Int? , _ nextPage: Int? , _ breedsCompletion: () throws -> [String]) -> Void) {
+    private func getBreeds(fromPage page: Int, _ completion: @escaping ( _ breedsCompletion: () throws -> (currentPage: Int?, nextPage: Int?, breedsList: [String])) -> Void) {
         guard let url = URL(string: "https://catfact.ninja/breeds?page=\(page)") else {
-            completion(nil, nil) { throw NetworkError.invalidURL }
+            completion { throw NetworkError.invalidURL }
             return
         }
         NetworkController.performNetworkRequest(for: url, httpMethod: "GET", contentType: "application/json") { data, error in
             guard let data = data, error == nil else {
-                completion(nil, nil) { throw error ?? NetworkError.dataUnavailable }
+                completion { throw error ?? NetworkError.dataUnavailable }
                 return
             }
             do {
                 let jsonObj = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
                 guard let breedsList = jsonObj?["data"] as? [[String: Any]], let currentPage = jsonObj?["current_page"] as? Int else {
-                    completion(nil, nil) { throw NetworkError.dataUnavailable }
+                    completion { throw NetworkError.dataUnavailable }
                     return
                 }
                 
                 let nextPage = jsonObj?["next_page_url"] as? String != nil ? currentPage + 1 : nil
                 
-                completion(currentPage, nextPage) {
+                completion {
                     var breeds: [String] = []
                     for breed in breedsList {
                         guard let breed = breed["breed"] as? String else { continue }
                         breeds.append(breed)
                     }
                     
-                    return breeds
+                    return (currentPage, nextPage, breeds)
                 }
             } catch {
-                completion(nil, nil) { throw error }
+                completion { throw error }
             }
             
             
@@ -162,14 +164,15 @@ extension BreedListViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         if indexPath.row == breedsList.count - 1, let nextPage = nextPage {
             titleLabel.text = "Loading Breeds..."
-            getBreeds(fromPage: nextPage, { currentPage, nextPage, breedsCompletion in
+            getBreeds(fromPage: nextPage, { breedsCompletion in
                 DispatchQueue.main.async {
                     self.titleLabel.text = "Cat Breed List"
                 }
                 do {
-                    self.breedsList.append(contentsOf: try breedsCompletion())
-                    self.currentPage = currentPage ?? self.currentPage
-                    self.nextPage = nextPage
+                    let breedsTuple = try breedsCompletion()
+                    self.breedsList.append(contentsOf: breedsTuple.breedsList)
+                    self.currentPage = breedsTuple.currentPage ?? self.currentPage
+                    self.nextPage = breedsTuple.nextPage
                 } catch {
                     self.showAlert(title: "Error Loading Breeds", message: "Please try again")
                 }
